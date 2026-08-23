@@ -59,15 +59,15 @@ function filename(invoice: Invoice): string {
 }
 
 async function main() {
-  intro('notion-invoice-cli')
+  intro('howdy')
 
   const load = spinner()
   load.start('Loading invoices from Notion')
   const [invoices, issuer] = await Promise.all([listInvoices(), loadIssuer()])
-  load.stop(`Loaded ${invoices.length} invoices`)
+  load.stop(`${invoices.length} ${invoices.length === 1 ? 'invoice' : 'invoices'} loaded`)
 
   if (invoices.length === 0) {
-    cancel('No invoices found.')
+    cancel('see ya')
     process.exit(1)
   }
 
@@ -75,14 +75,14 @@ async function main() {
     const digits = requested.replace(/\D/g, '')
     const match = invoices.find(i => (i.number.match(/\d+/)?.[0] ?? '').replace(/^0+/, '') === digits.replace(/^0+/, ''))
     if (!match) {
-      cancel(`No invoice matching "${requested}".`)
+      cancel(`No invoice found matching "${requested}"`)
       process.exit(1)
     }
     return buildInvoice(match.pageId, issuer)
   }
 
-  const choice = await select({
-    message: 'Which invoice?',
+  const invoice = await select({
+    message: 'Select an invoice',
     options: invoices.map(i => ({
       value: i.pageId,
       label: `${i.number}  ${i.clientName}`,
@@ -90,19 +90,19 @@ async function main() {
     })),
   })
 
-  if (isCancel(choice)) {
-    cancel('Cancelled.')
+  if (isCancel(invoice)) {
+    cancel('see ya')
     process.exit(0)
   }
 
-  return buildInvoice(choice as string, issuer)
+  return buildInvoice(invoice as string, issuer)
 }
 
 async function buildInvoice(pageId: string, issuer: Issuer) {
-  const fetching = spinner()
-  fetching.start('Fetching line items')
+  const load = spinner()
+  load.start('Loading line items')
   const invoice = await fetchInvoice(pageId)
-  fetching.stop(`${invoice.lines.length} line items · ${invoice.totalHours} hours`)
+  load.stop(`${invoice.lines.length} line items · ${invoice.totalHours} hours`)
 
   if (!checkTotals(invoice)) process.exit(1)
 
@@ -118,10 +118,10 @@ async function buildInvoice(pageId: string, issuer: Issuer) {
     const render = spinner()
     render.start('Rendering PDF')
     await renderPdf(html, path)
-    render.stop('Rendered')
+    render.stop('All done ✅')
   }
 
-  outro(path.replace(process.cwd() + '/', ''))
+  outro('File saved @ ' + path.replace(process.cwd() + '/', ''))
 }
 
 main().catch(err => {
