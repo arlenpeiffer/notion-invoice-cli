@@ -59,7 +59,7 @@ function filename(invoice: Invoice): string {
 }
 
 async function main() {
-  intro('notion-invoice')
+  intro('notion-invoice-cli')
 
   const load = spinner()
   load.start('Loading invoices from Notion')

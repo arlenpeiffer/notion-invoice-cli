@@ -1,4 +1,4 @@
-# notion-invoice
+# notion-invoice-cli
 
 Reads an invoice from Notion, resolves its hour entries, and renders a typeset PDF.
 
