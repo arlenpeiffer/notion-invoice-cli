@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { cancel, intro, isCancel, outro, select, spinner } from '@clack/prompts'
 import { loadIssuer, type Issuer } from './config.js'
@@ -11,10 +11,8 @@ import { formatCurrency, formatDate, formatHours } from './utils.js'
 const OUT_DIR = new URL('../out/', import.meta.url)
 
 const args = process.argv.slice(2)
-const wantHtml = args.includes('--html')
 const force = args.includes('--force')
-/** Optional invoice number, to skip the picker for scripted or repeat runs. */
-const requested = args.find(a => !a.startsWith('--'))
+const invoiceNumber = args.find(arg => !arg.startsWith('--'))
 
 /**
  * The rollup is what Notion shows and the summed lines are what gets printed.
@@ -71,11 +69,11 @@ async function main() {
     process.exit(1)
   }
 
-  if (requested) {
-    const digits = requested.replace(/\D/g, '')
+  if (invoiceNumber) {
+    const digits = invoiceNumber.replace(/\D/g, '')
     const match = invoices.find(i => (i.number.match(/\d+/)?.[0] ?? '').replace(/^0+/, '') === digits.replace(/^0+/, ''))
     if (!match) {
-      cancel(`No invoice found matching "${requested}"`)
+      cancel(`No invoice found matching "${invoiceNumber}"`)
       process.exit(1)
     }
     return buildInvoice(match.pageId, issuer)
@@ -109,17 +107,13 @@ async function buildInvoice(pageId: string, issuer: Issuer) {
   const html = await renderHtml(invoice, issuer)
   await mkdir(OUT_DIR, { recursive: true })
 
-  const target = new URL(`${filename(invoice)}.${wantHtml ? 'html' : 'pdf'}`, OUT_DIR)
+  const target = new URL(`${filename(invoice)}.pdf`, OUT_DIR)
   const path = fileURLToPath(target)
 
-  if (wantHtml) {
-    await writeFile(target, html)
-  } else {
-    const render = spinner()
-    render.start('Rendering PDF')
-    await renderPdf(html, path)
-    render.stop('All done ✅')
-  }
+  const render = spinner()
+  render.start('Rendering PDF')
+  await renderPdf(html, path)
+  render.stop('All done ✅')
 
   outro('File saved @ ' + path.replace(process.cwd() + '/', ''))
 }

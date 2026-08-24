@@ -21,7 +21,6 @@ Reads an invoice from Notion, resolves its hour entries, and renders a typeset P
 ```bash
 pnpm invoice              # pick from a list, render a PDF
 pnpm invoice 008          # skip the picker
-pnpm invoice --html       # write HTML instead, for fast layout iteration
 pnpm invoice 008 --force  # render even if totals disagree with Notion
 ```
 
