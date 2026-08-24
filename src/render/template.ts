@@ -17,65 +17,98 @@ export async function renderHtml(invoice: Invoice, issuer: Issuer): Promise<stri
         <tr>
           <td>${esc(formatDate(line.date))}</td>
           <td>${esc(line.project)}</td>
-          <td class="num">${esc(formatHours(line.hours))}</td>
-          <td class="num">${esc(formatCurrency(line.rate))}</td>
-          <td class="num">${esc(formatCurrency(line.amount))}</td>
-        </tr>`,
+          <td class="numeric">${esc(formatHours(line.hours))}</td>
+          <td class="numeric">${esc(formatCurrency(line.rate))}</td>
+          <td class="numeric">${esc(formatCurrency(line.amount))}</td>
+        </tr>
+      `,
     )
     .join('')
 
-  const lines = (items: string[]) => items.map(l => `<div>${esc(l)}</div>`).join('')
+  const address = (parts: string[]) => parts.map(part => `<div>${esc(part)}</div>`).join('')
 
-  return `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>${esc(invoice.number)} — ${esc(invoice.clientName)}</title>
-<style>${css}</style>
-</head>
-<body>
-  <header class="masthead">
-    <div class="wordmark">${esc(issuer.name)}</div>
-    <div class="invoice-no">${esc(invoice.number)}</div>
-  </header>
+  return `
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <title>${esc(invoice.number)} — ${esc(invoice.clientName)}</title>
+        <style>${css}</style>
+      </head>
 
-  <section class="meta">
-    <div class="bill-to">
-      <h2>Bill To</h2>
-      <div class="client-name">${esc(invoice.clientName)}</div>
-      ${lines(invoice.clientAddress)}
-    </div>
-    <dl class="terms">
-      <dt>Invoice Date</dt><dd>${esc(formatDate(invoice.date))}</dd>
-      <dt>Due Date</dt><dd>${esc(formatDate(invoice.dueDate))}</dd>
-      ${invoice.terms ? `<dt>Terms</dt><dd>${esc(invoice.terms)}</dd>` : ''}
-    </dl>
-  </section>
+      <body>
+        <header>
+          <div class="heading">${esc(issuer.name)}</div>
+          <div class="subheading">${esc(invoice.number)}</div>
+        </header>
 
-  <table class="items">
-    <thead>
-      <tr>
-        <th>Date</th><th>Project</th>
-        <th class="num">Hours</th><th class="num">Rate</th><th class="num">Amount</th>
-      </tr>
-    </thead>
-    <tbody>${rows}</tbody>
-  </table>
+        <main>
+          <dl class="meta">
+            <div class="bill-to">
+              <dt class="label">Bill To</dt>
+              <dd>
+                <div class="client-name">${esc(invoice.clientName)}</div>
+                ${address(invoice.clientAddress)}
+              </dd>
+            </div>
+            <div>
+              <dt class="label">Invoice Date</dt>
+              <dd>${esc(formatDate(invoice.date))}</dd>
+            </div>
+            <div>
+              <dt class="label">Terms</dt>
+              <dd>${esc(invoice.terms)}</dd>
+            </div>
+            <div>
+              <dt class="label">Due Date</dt>
+              <dd>${esc(formatDate(invoice.dueDate))}</dd>
+            </div>
+          </dl>
 
-  <section class="totals">
-    <div class="row"><span>Total Hours</span><span class="num">${esc(formatHours(invoice.totalHours))}</span></div>
-    <div class="row grand"><span>Total Due</span><span class="num">${esc(formatCurrency(invoice.totalAmount))}</span></div>
-  </section>
+          <table>
+            <colgroup>
+              <col>
+              <col class="wide">
+              <col>
+              <col>
+              <col>
+            </colgroup>
+            <thead>
+              <tr>
+                <th class="label">Date</th>
+                <th class="label">Project</th>
+                <th class="label numeric">Hours</th>
+                <th class="label numeric">Rate</th>
+                <th class="label numeric">Amount</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
 
-  <footer class="footer">
-    ${issuer.paymentInstructions.length ? `<div class="pay"><h2>Payment</h2>${lines(issuer.paymentInstructions)}</div>` : ''}
-    <div class="issuer">
-      ${lines(issuer.address)}
-      ${issuer.email ? `<div>${esc(issuer.email)}</div>` : ''}
-      ${issuer.taxId ? `<div>${esc(issuer.taxId)}</div>` : ''}
-    </div>
-    ${issuer.thankYou ? `<p class="thanks">${esc(issuer.thankYou)}</p>` : ''}
-  </footer>
-</body>
-</html>`
+          <section class="totals">
+            <div class="row">
+              <span>Total Hours</span>
+              <span>${esc(formatHours(invoice.totalHours))}</span>
+            </div>
+            <div class="row grand">
+              <span>Total Due</span>
+              <span>${esc(formatCurrency(invoice.totalAmount))}</span>
+            </div>
+          </section>
+        </main>
+
+        <footer>
+          <div class="subheading">Thank you!</div>
+          <div>
+            <div>${esc(issuer.name)}</div>
+            <div>${esc(issuer.email)}</div>
+            <div>${esc(issuer.phone)}</div>
+          </div>
+          <div>
+            ${address(issuer.address)}
+          </div>
+        </footer>
+      </body>
+    </html>
+  `
 }

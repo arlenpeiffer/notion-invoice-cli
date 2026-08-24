@@ -1,161 +1,165 @@
-/* Layout iteration happens here. The template emits semantic HTML only. */
-
 :root {
-  --ink: #16181d;
-  --muted: #6b7280;
-  --rule: #e3e5e9;
-  --accent: #16181d;
+  --color-ink: #16181d;
+  --color-muted: #6b7280;
+  --color-hairline: #e3e5e9;
+  --column-width: 18%;
+  --column-width-wide: 28%;
+  --font-size-small: 8pt;
+  --font-size-base: 10.5pt;
+  --font-size-medium: 12pt;
+  --font-size-large: 14pt;
+  --font-size-xlarge: 20pt;
+  --font-weight-bold: 600;
+  --line-height-base: 1.38;
+  --line-height-large: 1.8;
+  --space-xsmall: 0.35rem;
+  --space-small: 0.7rem;
+  --space-medium: 0.9rem;
+  --space-large: 2rem;
+  --space-xlarge: 6rem;
 }
 
 @page {
-  size: letter;
   margin: 0.6in;
+  size: letter;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
-  margin: 0;
-  color: var(--ink);
+  color: var(--color-ink);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  font-size: 10.5pt;
-  line-height: 1.38;
+  font-size: var(--font-size-base);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-base);
+  margin: 0;
   -webkit-font-smoothing: antialiased;
 }
 
-h2 {
-  margin: 0 0 0.35rem;
-  font-size: 8pt;
-  font-weight: 600;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-/* Numerics share a column width so decimal points stack down the page. */
-.num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-.masthead {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding-bottom: 0.9rem;
-  border-bottom: 2px solid var(--accent);
-}
-
-.wordmark {
-  font-size: 15pt;
-  font-weight: 600;
+.heading {
+  font-size: var(--font-size-xlarge);
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.01em;
 }
 
-.invoice-no {
-  font-size: 13pt;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
+.subheading {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-bold);
+}
+
+.label {
+  color: var(--color-muted);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.09em;
+  margin-bottom: var(--space-xsmall);
+  text-transform: uppercase;
+}
+
+header {
+  align-items: baseline;
+  border-bottom: 2px solid var(--color-ink);
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: var(--space-medium);
 }
 
 .meta {
   display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-  margin: 1.3rem 0 1.45rem;
+  margin: var(--space-large) 0;
 }
 
-.client-name { font-weight: 600; }
+.meta > .bill-to {
+  color: var(--color-muted);
+  width: calc(var(--column-width) + var(--column-width-wide));
+}
 
-.bill-to div { color: var(--muted); }
-.bill-to .client-name { color: var(--ink); }
-
-.terms {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 0.15rem 1.25rem;
-  margin: 0;
+.meta > :not(.bill-to) {
   text-align: right;
+  width: var(--column-width);
 }
 
-.terms dt {
-  color: var(--muted);
-  font-size: 9pt;
-}
-
-.terms dd {
+.meta dd {
   margin: 0;
-  font-variant-numeric: tabular-nums;
 }
 
-.items {
-  width: 100%;
+.client-name {
+  color: var(--color-ink); 
+  font-weight: var(--font-weight-bold);
+}
+
+table {
   border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+col {
+  width: var(--column-width);
+}
+
+col.wide {
+  width: var(--column-width-wide);
 }
 
 /* Repeats the header on every page of a long invoice. */
-.items thead { display: table-header-group; }
+thead {
+  display: table-header-group;
+}
 
-.items th {
-  padding: 0 0 0.45rem;
-  border-bottom: 1px solid var(--accent);
-  font-size: 8pt;
-  font-weight: 600;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--muted);
+th {
+  border-bottom: 1px solid var(--color-ink);
+  padding-bottom: var(--space-xsmall);
   text-align: left;
 }
 
-.items td {
-  padding: 0.34rem 0;
-  border-bottom: 1px solid var(--rule);
+td {
+  border-bottom: 1px solid var(--color-hairline);
+  padding: var(--space-xsmall) 0;
 }
 
-.items th + th,
-.items td + td { padding-left: 0.9rem; }
+th.numeric,
+td.numeric {
+  text-align: right;
+}
+
+th + th,
+td + td {
+  padding-left: var(--space-medium);
+}
 
 /* No line item may be split across a page boundary. */
-.items tr { break-inside: avoid; }
+tr {
+  break-inside: avoid;
+}
 
 .totals {
-  margin-left: auto;
-  margin-top: 0.7rem;
-  width: 42%;
   break-inside: avoid;
+  font-size: var(--font-size-medium);
+  margin-left: auto;
+  margin-top: var(--space-xsmall);
+  width: calc(var(--column-width) * 2.75);
 }
 
 .totals .row {
   display: flex;
   justify-content: space-between;
-  padding: 0.3rem 0;
+  padding: var(--space-small) 0;
 }
 
 .totals .grand {
-  margin-top: 0.3rem;
-  padding-top: 0.55rem;
-  border-top: 2px solid var(--accent);
-  font-size: 12pt;
-  font-weight: 600;
+  border-top: 2px solid var(--color-ink);
+  font-weight: var(--font-weight-bold);
 }
 
-.footer {
-  margin-top: 1.5rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid var(--rule);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 1.5rem;
-  font-size: 9pt;
-  color: var(--muted);
+footer {
+  border-top: 1px solid var(--color-hairline);
   break-inside: avoid;
-}
-
-.issuer { text-align: right; }
-
-.thanks {
-  flex-basis: 100%;
-  margin: 0.5rem 0 0;
-  color: var(--muted);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  line-height: var(--line-height-large);
+  margin-top: var(--space-xlarge);
+  padding-top: var(--space-medium);
 }

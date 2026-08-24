@@ -2,11 +2,11 @@
   "name": "Your Name or Studio",
   "address": ["123 Example Street", "Portland, OR 97201", "United States"],
   "email": "you@example.com",
+  "phone": "(555) 555-5555",
   "taxId": "EIN 00-0000000",
   "paymentInstructions": [
     "Bank transfer — Example Bank",
     "Routing 000000000 · Account 0000000000",
     "Or Zelle to you@example.com"
-  ],
-  "thankYou": "Thank you for your business."
+  ]
 }

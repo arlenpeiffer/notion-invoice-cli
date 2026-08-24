@@ -34,10 +34,10 @@ export function dataSourceIds() {
 const IssuerSchema = z.object({
   name: z.string().min(1),
   address: z.array(z.string()).min(1),
-  email: z.string().email().optional(),
+  email: z.string().email(),
+  phone: z.string(),
   taxId: z.string().optional(),
   paymentInstructions: z.array(z.string()).default([]),
-  thankYou: z.string().optional(),
 })
 
 export type Issuer = z.infer<typeof IssuerSchema>
